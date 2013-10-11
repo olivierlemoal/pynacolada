@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>PyBrowse</title>
+	</head>
+	<body>
+	{% if error %}
+    	<p class=error><strong>Error:</strong> {{ error }}
+  	{% endif %}
+	{% from "_formhelpers.html" import render_field %}
+		<form method=post action="/login">
+		{{ form.csrf_token }}
+			<dl>
+				{{ render_field(form.username) }}
+				{{ render_field(form.password) }}
+				{{ render_field(form.rememberme) }}
+			</dl>
+			<p><input type=submit value=Login>
+		</form>
+	</body>
+</html>

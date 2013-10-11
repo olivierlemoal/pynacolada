@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+    <head>
+        <title>PyBrowser</title>
+    </head>
+    <body>
+        <div id="directories">
+            <ul>
+            {% if directory %}
+                <li><a href="..">..</a></li>
+            {% endif %}
+            {% if directories %}                
+                {% for dir in directories %}
+                    <li><input type="checkbox" name="checkbox1" value="checkbox"><a href="{{ url_for('public', public_id=public_id, directory=dir + "/") }}">{{ dir.name }}</a></li>
+                {% endfor %}                             
+            {% endif %}
+            </ul> 
+        </div>
+        <div id="files">
+            {% if files %}
+                <ul>
+                {% for file in files %}
+                    <li><a href="{{ url_for('public', public_id=public_id, directory=file) }}">{{ file.name }}</a></li>
+                {% endfor %}
+                </ul>
+            {% else %}
+              Répertoire vide
+            {% endif %}
+        </div>
+    </body>
+</html>
