@@ -4,28 +4,31 @@
         <title>PyBrowser</title>
     </head>
     <body>
-        <div id="directories">
-            <ul>
-            {% if directory %}
-                <li><a href="..">..</a></li>
-            {% endif %}
-            {% if directories %}                
-                {% for dir in directories %}
-                    <li><input type="checkbox" name="checkbox1" value="checkbox"><a href="{{ url_for('list', directory=dir) }}">{{ dir.name }}</a></li>
-                {% endfor %}                             
-            {% endif %}
-            </ul> 
-        </div>
-        <div id="files">
-            {% if files %}
+        <form>
+            <div id="directories">
                 <ul>
-                {% for file in files %}
-                    <li><a href="{{ url_for('download', todl_path=file) }}">{{ file.name }}</a></li>
-                {% endfor %}
-                </ul>
-            {% else %}
-              Répertoire vide
-            {% endif %}
-        </div>
+                {% if directory %}
+                    <li><a href="..">..</a></li>
+                {% endif %}
+                {% if directories %}                
+                    {% for dir in directories %}
+                        <li><input type="checkbox" name="selected" value="{{ dir }}"><a href="{{ url_for('list', directory=dir) }}">{{ dir.name }}</a></li>
+                    {% endfor %}                             
+                {% endif %}
+                </ul> 
+            </div>
+            <div id="files">
+                {% if files %}
+                    <ul>
+                    {% for file in files %}
+                        <li><input type="checkbox" name="selected" value="{{ file }}"><a href="{{ url_for('download', todl_path=file) }}">{{ file.name }}</a></li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                  Répertoire vide
+                {% endif %}
+            </div>
+            <input type="submit" formaction="/zip" formmethod="post" value="Zip">
+        </form>
     </body>
 </html>

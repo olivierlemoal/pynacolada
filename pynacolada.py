@@ -2,7 +2,8 @@
 # TODO : Templates, public folder, zip
 import tempfile
 import hashlib
-from shutil import make_archive
+import os
+import zipfile
 
 from path import path
 from flask import Flask, render_template, send_file, url_for, redirect, abort, request, session
@@ -178,17 +179,24 @@ def download(todl_path):
     return send_file(file_path, as_attachment=True)
 
 
-@app.route("/zip/<path:tozip_path>")
+@app.route("/zip", methods=['POST'])
 @login_required
-def zip(tozip_path):
-    tozip_path = path(session['root_folder'] + tozip_path)
-    if not tozip_path.abspath().startswith(session['root_folder']) or not tozip_path.isdir():
-        abort(404)
-    archive_type = "zip"
+def zip():
+    selection = request.form.getlist('selected')
     temp_file = tempfile.NamedTemporaryFile()
-    archive = make_archive(temp_file.name, archive_type, tozip_path)
-    # temp_file.close()
-    return send_file(archive, as_attachment=True, attachment_filename=path(tozip_path).name)
+    archive = zipfile.ZipFile(temp_file.name, 'a')
+    user_path = session['root_folder']
+    os.chdir(user_path)
+    for sel in selection:
+        app.logger.debug(session['root_folder'] + sel)
+        the_path = path(sel)
+        if the_path.isdir():
+            for file in the_path.walk():
+                archive.write(file)
+        else:
+            archive.write(sel)
+    archive.close()
+    return send_file(temp_file.name, as_attachment=True, attachment_filename="archive.zip")
 
 
 if __name__ == "__main__":
