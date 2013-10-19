@@ -1,5 +1,5 @@
 # Depends : path.py, Flask, Flask-login, flask-wtf, wtform, Flask-SQLAlchemy, flask-bcrypt
-# TODO : Templates, public folder, zip
+# TODO : Templates, move/copy/show, show all public links for user
 import tempfile
 import hashlib
 import os
@@ -66,11 +66,10 @@ class LoginForm(Form):
     password = PasswordField('Password', [validators.Required()])
     rememberme = BooleanField('Remember me')
 
+
 #
 # Class Utils
 #
-
-
 class Utils:
 
     @staticmethod
@@ -83,10 +82,9 @@ class Utils:
             if the_path.isdir():
                 for file in the_path.walk():
                     archive.write(file)
-            else:
-                archive.write(sel)
+            archive.write(sel)
         archive.close()
-        return send_file(temp_file.name, as_attachment=True, attachment_filename="archive.zip")
+        return send_file(temp_file.name, as_attachment=True, attachment_filename=path(temp_file.name).name + ".zip")
 
 
 #
