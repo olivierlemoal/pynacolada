@@ -66,6 +66,28 @@ class LoginForm(Form):
     password = PasswordField('Password', [validators.Required()])
     rememberme = BooleanField('Remember me')
 
+#
+# Class Utils
+#
+
+
+class Utils:
+
+    @staticmethod
+    def zip(root_path, selection):
+        temp_file = tempfile.NamedTemporaryFile()
+        archive = zipfile.ZipFile(temp_file.name, 'a')
+        os.chdir(root_path)
+        for sel in selection:
+            the_path = path(sel)
+            if the_path.isdir():
+                for file in the_path.walk():
+                    archive.write(file)
+            else:
+                archive.write(sel)
+        archive.close()
+        return send_file(temp_file.name, as_attachment=True, attachment_filename="archive.zip")
+
 
 #
 # Views
@@ -103,7 +125,6 @@ def public(public_id, directory=None):
         return send_file(public_path, as_attachment=True)
     elif public_path.isdir():
         path_dir = public_path
-        app.logger.debug(directory)
         if directory:
             path_dir += "/" + directory
             if path_dir.isfile():
@@ -116,6 +137,15 @@ def public(public_id, directory=None):
         return render_template('list_public.html', files=files, directories=directories, directory=directory, public_id=public_id)
     else:
         abort(404)
+
+
+@app.route("/p/<public_id>/zip/", methods=['POST'])
+@login_required
+def public_zip(public_id):
+    selection = request.form.getlist('selected')
+    link = PublicLink.query.filter(PublicLink.link == public_id).first()
+    root_path = path(link.path)
+    return Utils.zip(root_path, selection)
 
 
 @app.route("/add_p/<path:public_path>")
@@ -183,20 +213,8 @@ def download(todl_path):
 @login_required
 def zip():
     selection = request.form.getlist('selected')
-    temp_file = tempfile.NamedTemporaryFile()
-    archive = zipfile.ZipFile(temp_file.name, 'a')
-    user_path = session['root_folder']
-    os.chdir(user_path)
-    for sel in selection:
-        app.logger.debug(session['root_folder'] + sel)
-        the_path = path(sel)
-        if the_path.isdir():
-            for file in the_path.walk():
-                archive.write(file)
-        else:
-            archive.write(sel)
-    archive.close()
-    return send_file(temp_file.name, as_attachment=True, attachment_filename="archive.zip")
+    root_path = session['root_folder']
+    return Utils.zip(root_path, selection)
 
 
 if __name__ == "__main__":
