@@ -6,16 +6,17 @@
     <body>
         <form>
             <div id="directories">
-                <ul>
+                <ul>             
                 {% if directory %}
+                
                     <li><a href="..">..</a></li>
                 {% endif %}
                 {% if directories %}                
                     {% for dir in directories %}
                         <li><input type="checkbox" name="selected" value="{{ dir }}"><a href="{{ url_for('list', directory=dir) }}">{{ dir.name }}</a></li>
-                    {% endfor %}                             
-                {% endif %}
-                </ul> 
+                    {% endfor %}                                   
+                {% endif %}  
+                </ul>              
             </div>
             <div id="files">
                 {% if files %}

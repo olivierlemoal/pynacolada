@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    {% if links %}
+    <table>
+        {% for link in links %}
+        <tr><td>{{ link.path }}<td><td>{{ url_for('public', public_id=link.link) }}</td></tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</body>
+</html>

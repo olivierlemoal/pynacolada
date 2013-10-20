@@ -1,5 +1,5 @@
 # Depends : path.py, Flask, Flask-login, flask-wtf, wtform, Flask-SQLAlchemy, flask-bcrypt
-# TODO : Templates, move/copy/show, show all public links for user
+# TODO : Templates design, install, move/copy/show, show all public links for user, public links password, mkdir/edit file ?, config, error handling
 import tempfile
 import hashlib
 import os
@@ -74,7 +74,7 @@ class Utils:
 
     @staticmethod
     def zip(root_path, selection):
-        temp_file = tempfile.NamedTemporaryFile()
+        temp_file = tempfile.NamedTemporaryFile(prefix='pyna_')
         archive = zipfile.ZipFile(temp_file.name, 'a')
         os.chdir(root_path)
         for sel in selection:
@@ -101,7 +101,7 @@ def load_user(userid):
     user = User.get(userid)
     session['root_folder'] = user.root_folder
     session.modified = True
-    return User.get(userid)
+    return user
 
 
 @app.route("/install")
@@ -154,6 +154,16 @@ def add_public(public_path):
     db.session.add(link)
     db.session.commit()
     return "ok"
+
+
+@app.route("/my_p/")
+@login_required
+def my_public_links():
+    links = PublicLink.query.filter(PublicLink.user == session["user_id"]).all()
+    for link in links:
+        link.path = path(link.path).relpath(session["root_folder"])
+    app.logger.debug(links)
+    return render_template('public_links.html', links=links)
 
 
 @app.route("/login", methods=["GET", "POST"])
